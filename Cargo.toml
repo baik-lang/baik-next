@@ -1,0 +1,7 @@
+[package]
+name = "baik-next"
+version = "10.0.0"
+authors = ["anak10thn <anak10thn@gmail.com>"]
+edition = "2018"
+
+[dependencies]
