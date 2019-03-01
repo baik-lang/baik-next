@@ -6,7 +6,7 @@ struct BaikLexer;
 use Rule::*;
 
 pub fn lexer() {
-    let pairs = BaikLexer::parse(hitung, "1234+1+(123+2+(1-2))").unwrap_or_else(|e| panic!("{}", e));
+    let pairs = BaikLexer::parse(document, "1234+1+(123+2+(1-2))").unwrap_or_else(|e| panic!("{}", e));
 
     for pair in pairs {
         println!("Rule:    {:?}", pair.as_rule());
