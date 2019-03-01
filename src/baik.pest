@@ -35,8 +35,8 @@ operation = _{ add | subtract | multiply | divide | power }
     divide   = { "/" }
     power    = { "^" }
 
-expr = { term ~ (operation ~ term)* }
-term = _{ float | int | "(" ~ (expr) ~ ")" }
+hitung = { term ~ (operation ~ term)* }
+term = _{ float | int | "(" ~ (hitung) ~ ")" }
 
 // name  = @{ (["_"] | letters) ~ (["_"] | letters | ['0'..'9'])* }
 // value = @{ variable | float | int | string | boolean | null | enum_val | list | object }
@@ -71,6 +71,6 @@ term = _{ float | int | "(" ~ (expr) ~ ")" }
 // mutation = { ["mutation"] ~ name? ~ variable_defs? ~ selection_set }
 
 // operation = { query | mutation | selection_set }
-tulis = { "tulis" ~ (whitespace | int | string | expr | ",")*}
+tulis = { "tulis" ~ (whitespace | int | string | hitung | ",")*}
 
-document = _{ SOI ~ (tulis | expr ) ~ EOI}
+document = _{ SOI ~ (tulis | hitung ) ~ EOI}

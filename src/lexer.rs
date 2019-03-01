@@ -6,12 +6,13 @@ struct BaikLexer;
 use Rule::*;
 
 pub fn lexer() {
-    let pairs = BaikLexer::parse(expr, "1234+1").unwrap_or_else(|e| panic!("{}", e));
+    let pairs = BaikLexer::parse(hitung, "1234+1").unwrap_or_else(|e| panic!("{}", e));
 
     for pair in pairs {
         println!("Rule:    {:?}", pair.as_rule());
         // println!("Span:    {:?}", pair.as_span());
-        // println!("Text:    {}", pair.as_str());
+        println!("Text:    {}", pair.as_str());
+        println!("----------ops---------");
 
         // A pair can be converted to an iterator of the tokens which make it up:
         for inner_pair in pair.into_inner() {
@@ -25,7 +26,7 @@ pub fn lexer() {
                 tulis => println!("Tulist:   {}", inner_pair.as_str()),
                 document => println!("Document:   {}", inner_pair.as_str()),
                 letters => println!("Letters:   {}", inner_pair.as_str()),
-                expr => println!("Expr:   {}", inner_pair.as_str()),
+                hitung => println!("Expr:   {}", inner_pair.as_str()),
                 operation => println!("Operation:   {}", inner_pair.as_str()),
                 term => println!("Term:   {}", inner_pair.as_str()),
                 add => println!("aritmatik:   {}", inner_pair.as_str()),
