@@ -154,7 +154,7 @@ pub fn parse(input: &str) -> Result<(), String> {
     if !parser.document() {
         let (_, pos) = parser.expected();
         let (line_no, col_no) = parser.input().line_col(pos);
-        return Err(format!("Invalid GraphQL syntax at line {}, column {}", line_no, col_no));
+        return Err(format!("syntax bermasalah {}, column {}", line_no, col_no));
     }
 
 //    parser.main()
