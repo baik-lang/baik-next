@@ -20,7 +20,18 @@ float    = @{
             '1'..'9' ~ '0'..'9'* ~ "." ~ '0'..'9'+ ~ exp?
         )
 }
-string   = @{ PUSH("\"" | "'") ~ (escape | whitespace | letters)* ~ POP  }
+string   = @{ PUSH("\"" | "'") ~ 
+            (escape 
+            | whitespace 
+            | letters 
+            | float 
+            | int 
+            | "!" | "@" | "#" | "$" | "%" | "^" | "&" | "(" | ")"
+            | "-" | "_" | "=" | "{" | "}" | "[" | "]" | ":" | ";"
+            | "<" | ">" | "." | "," | "/" | "?"
+            | add | subtract | multiply | divide | power
+            )* 
+            ~ POP  }
 // variable = @{ ["$"] ~ name }
 // enum_val = @{ !(boolean | null) ~ name }
 // list     = @{ ["["] ~ value ~ ["]"] }
