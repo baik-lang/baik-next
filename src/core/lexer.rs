@@ -1,7 +1,7 @@
 use pest::Parser;
 
 #[derive(Parser)]
-#[grammar = "baik.pest"]
+#[grammar = "grammer/baik.pest"]
 struct BaikLexer;
 use Rule::*;
 
