@@ -1,8 +1,8 @@
 whitespace = _{ (" " | "\t" | "\r" | "\n") + }
 
-// comment = _{ ["#"] ~ (!(["\n"]) ~ any)* ~ ["\n"] }
+comment = _{ "#" ~ (!("\n") ~ ANY)* ~ "\n" }
 letters = _{ 'A'..'Z' | 'a'..'z' }
-// exp     = _{ (["e"] | ["E"]) ~ (["+"] | ["-"])? ~ ['1'..'9']+ }
+exp     = _{ ("e" | "E") ~ ("+" | "-")? ~ '1'..'9'+ }
 hex     = _{ '0'..'9' | 'a'..'f' | 'A'..'F' }
 unicode = _{ "u" ~ hex ~ hex ~ hex ~ hex }
 escape  = _{ "\\" ~ ("\"" | "\\" | "/" | "b" | "f" | "n" | "r" | "t" | unicode) }
@@ -12,20 +12,31 @@ escape  = _{ "\\" ~ ("\"" | "\\" | "/" | "b" | "f" | "n" | "r" | "t" | unicode) 
 // boolean  = _{ op_true | op_false }
 // null     = { ["null"] }
 int      = @{ "-"? ~ ("0" | '1'..'9' ~ '0'..'9'*) }
-// float    = @{
-//     ["-"]? ~
-//         (
-//             ['1'..'9']+ ~ exp |
-//             ["0"] ~ ["."] ~ ['0'..'9']+ ~ exp? |
-//             ['1'..'9'] ~ ['0'..'9']* ~ ["."] ~ ['0'..'9']+ ~ exp?
-//         )
-// }
+float    = @{
+    "-"? ~
+        (
+            '1'..'9'+ ~ exp |
+            "0" ~ "." ~ '0'..'9'+ ~ exp? |
+            '1'..'9' ~ '0'..'9'* ~ "." ~ '0'..'9'+ ~ exp?
+        )
+}
 string   = @{ PUSH("\"" | "'") ~ (escape | whitespace | letters)* ~ POP  }
 // variable = @{ ["$"] ~ name }
 // enum_val = @{ !(boolean | null) ~ name }
 // list     = @{ ["["] ~ value ~ ["]"] }
 // arg      = { name ~ [":"] ~ value }
 // object   = { ["{"] ~ (arg ~ ([","] ~ arg)*)? ~ ["}"] }
+
+// arithmetic
+operation = _{ add | subtract | multiply | divide | power }
+    add      = { "+" }
+    subtract = { "-" }
+    multiply = { "*" }
+    divide   = { "/" }
+    power    = { "^" }
+
+expr = { term ~ (operation ~ term)* }
+term = _{ float | int | "(" ~ (expr) ~ ")" }
 
 // name  = @{ (["_"] | letters) ~ (["_"] | letters | ['0'..'9'])* }
 // value = @{ variable | float | int | string | boolean | null | enum_val | list | object }
@@ -60,6 +71,6 @@ string   = @{ PUSH("\"" | "'") ~ (escape | whitespace | letters)* ~ POP  }
 // mutation = { ["mutation"] ~ name? ~ variable_defs? ~ selection_set }
 
 // operation = { query | mutation | selection_set }
-tulis = { "tulis" ~ (whitespace | int | string | ",")*}
+tulis = { "tulis" ~ (whitespace | int | string | expr | ",")*}
 
-document = _{ SOI ~ (tulis) ~ EOI}
+document = _{ SOI ~ (tulis | expr ) ~ EOI}
