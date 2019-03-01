@@ -6,7 +6,7 @@ version = "0.3.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
-name = "baik-next"
+name = "baik"
 version = "10.0.0"
 dependencies = [
  "pest 2.1.0 (registry+https://github.com/rust-lang/crates.io-index)",

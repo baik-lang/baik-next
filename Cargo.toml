@@ -1,5 +1,5 @@
 [package]
-name = "baik-next"
+name = "baik"
 version = "10.0.0"
 authors = ["anak10thn <anak10thn@gmail.com>"]
 edition = "2018"
@@ -7,3 +7,7 @@ edition = "2018"
 [dependencies]
 pest = "2.1.0"
 pest_derive = "2.1.0"
+
+[[bin]]
+name = "baik"
+doc = false
