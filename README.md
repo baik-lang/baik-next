@@ -11,7 +11,7 @@
     - [x] Execution Tree
 - [ ] Core
     - [x] Math
-    - [ ] Variable
+    - [x] Variable
     - [x] Data type (int, float, string, etc..)
 - [ ] IO
     - [ ] fs
