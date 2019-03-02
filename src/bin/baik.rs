@@ -6,5 +6,6 @@ use baik::core;
 
 fn main() {
     core::lexer();
-    core::tulis();
+    //core::tulis();
+    core::math::add
 }
