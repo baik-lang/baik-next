@@ -1,0 +1,26 @@
+# BAIK Scripting Language NEXT
+## Progress
+- [x] Parser
+    - [x] Lexer
+    - [x] Tokenize
+    - [x] Function
+    - [x] Expr
+    - [x] Grammer
+    - [x] Operator
+    - [x] Node
+    - [x] Execution Tree
+- [ ] Core
+    - [x] Math
+    - [ ] Variable
+    - [x] Data type (int, float, string, etc..)
+- [ ] IO
+    - [ ] fs
+    - [ ] net
+    - [ ] stdout
+    - [ ] stderr
+    - [ ] stdwarn
+    - [ ] stdin
+- [ ] FFI
+- [ ] Wasm Import
+- [ ] REPL
+- [ ] Library
