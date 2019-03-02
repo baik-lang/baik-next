@@ -1,0 +1,3 @@
+fungsi test(a,b) {
+    tulis "abc"
+}

@@ -7,10 +7,16 @@ hex     = _{ '0'..'9' | 'a'..'f' | 'A'..'F' }
 unicode = _{ "u" ~ hex ~ hex ~ hex ~ hex }
 escape  = _{ "\\" ~ ("\"" | "\\" | "/" | "b" | "f" | "n" | "r" | "t" | unicode) }
 
-// op_true  = { ["true"] }
-// op_false = { ["false"] }
-// boolean  = _{ op_true | op_false }
-// null     = { ["null"] }
+op_true  = { "benar" }
+op_false = { "salah" }
+boolean  = _{ op_true | op_false }
+null     = { "null" }
+enum_val = @{ !(boolean | null) ~ name }
+list     = @{ ( list_str | "[" ) ~ (value ~ ("," ~ value)*?)? ~ ( "]" | ")") }
+list_str = {"untaian" ~ (" " | "(")*}
+object   = { "{" ~ (arg ~ ("," ~ arg)*)? ~ "}" }
+arg      = { name ~ ":" ~ value }
+
 int      = @{ "-"? ~ ("0" | '1'..'9' ~ '0'..'9'*) }
 float    = @{
     "-"? ~
@@ -32,11 +38,11 @@ string   = @{ PUSH("\"" | "'") ~
             | add | subtract | multiply | divide | power
             )* 
             ~ POP  }
-// variable = @{ ["$"] ~ name }
-// enum_val = @{ !(boolean | null) ~ name }
-// list     = @{ ["["] ~ value ~ ["]"] }
-// arg      = { name ~ [":"] ~ value }
-// object   = { ["{"] ~ (arg ~ ([","] ~ arg)*)? ~ ["}"] }
+
+variable = @{ name ~ (" " | "=")* ~ value }
+name  = { ("_" | letters | '0'..'9')* }
+value = { var_call | float | int | string | boolean | null | enum_val | list | object }
+var_call = { "&" ~ name }
 
 // arithmetic
 operation = _{ add | subtract | multiply | divide | power }
@@ -49,39 +55,15 @@ operation = _{ add | subtract | multiply | divide | power }
 hitung = { term ~ (operation ~ term)* }
 term = _{ float | int | "(" ~ (hitung) ~ ")" }
 
-// name  = @{ (["_"] | letters) ~ (["_"] | letters | ['0'..'9'])* }
-// value = @{ variable | float | int | string | boolean | null | enum_val | list | object }
+// Funcion
+func = @{ func_start ~ /*func_name ~ */func_input ~ (func_begin ~ func_body ~ func_end) }
+func_start = _{ "fungsi"}
+//func_name = _{name}
+func_input = _{name ~ PUSH("(")  ~ (name ~ ("," ~ name)*?)? ~ POP }
+func_begin = _{whitespace*? ~ "{" ~ whitespace*?}
+func_body = _{whitespace*? ~ (tulis | hitung | variable) ~ whitespace*? }
+func_end = _{ whitespace*? ~ "}"}
 
-// // More variables stuff
-// named_type = { name }
-// list_type = {["["] ~ types ~ ["]"]}
-// non_null_type = { (named_type | list_type) ~ ["!"]}
-// types = { named_type | list_type | non_null_type }
-// variable_def = { variable ~ ["="] ~ default_value }
-// variable_defs = { ["("] ~ variable_def? ~ ([","] ~ variable_def)* ~ [")"] }
-
-// // Directive
-// directive = { ["@"] ~ name ~ args? }
-
-// // Selections
-// selection = { field | fragment_spread | fragment_inline }
-// selection_set = { ["{"] ~ selection+ ~ ["}"] }
-
-// // Field
-// alias = { name ~ [":"]}
-// args  = { ["("] ~ arg ~ ([","] ~ arg)* ~ [","]? ~ [")"]}
-// field = { alias? ~ name ~ args? ~ directive? ~selection_set? }
-
-// // Fragments
-// fragment_name = { !["on"] ~ name }
-// fragment_def = { ["fragment"] ~ fragment_name ~ ["on"] ~ name ~ directive? ~ selection_set }
-// fragment_spread = @{ ["..."] ~ fragment_name ~ directive? }
-// fragment_inline = { ["..."] ~ (["on"] ~ name)? ~ directive? ~ selection_set }
-
-// query = { ["query"] ~ name? ~ variable_defs? ~ selection_set }
-// mutation = { ["mutation"] ~ name? ~ variable_defs? ~ selection_set }
-
-// operation = { query | mutation | selection_set }
 tulis = { "tulis" ~ (whitespace | int | string | hitung | ",")*}
 
-document = _{ SOI ~ (tulis | hitung ) ~ EOI}
+document = _{ SOI ~ (tulis | hitung | func | variable) ~ EOI}

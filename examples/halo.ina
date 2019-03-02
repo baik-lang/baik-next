@@ -1,1 +1,3 @@
 tulis "Halo dunia!"
+tulis "ya",123,"ya",(1+2)
+1+2*(1+2)
