@@ -1,21 +1,22 @@
+use crate::*;
 use serde_json::Value;
+use Error;
 use to_value;
-use error::Error;
 
 pub trait Math {
-    fn add(&self, &Value) -> Result<Value, Error>;
-    fn mul(&self, &Value) -> Result<Value, Error>;
-    fn sub(&self, &Value) -> Result<Value, Error>;
-    fn div(&self, &Value) -> Result<Value, Error>;
-    fn rem(&self, &Value) -> Result<Value, Error>;
-    fn eq(&self, &Value) -> Result<Value, Error>;
-    fn ne(&self, &Value) -> Result<Value, Error>;
-    fn gt(&self, &Value) -> Result<Value, Error>;
-    fn lt(&self, &Value) -> Result<Value, Error>;
-    fn ge(&self, &Value) -> Result<Value, Error>;
-    fn le(&self, &Value) -> Result<Value, Error>;
-    fn and(&self, &Value) -> Result<Value, Error>;
-    fn or(&self, &Value) -> Result<Value, Error>;
+    fn add(&self, value: &Value) -> Result<Value, Error>;
+    fn mul(&self, value: &Value) -> Result<Value, Error>;
+    fn sub(&self, value: &Value) -> Result<Value, Error>;
+    fn div(&self, value: &Value) -> Result<Value, Error>;
+    fn rem(&self, value: &Value) -> Result<Value, Error>;
+    fn eq(&self, value: &Value) -> Result<Value, Error>;
+    fn ne(&self, value: &Value) -> Result<Value, Error>;
+    fn gt(&self, value: &Value) -> Result<Value, Error>;
+    fn lt(&self, value: &Value) -> Result<Value, Error>;
+    fn ge(&self, value: &Value) -> Result<Value, Error>;
+    fn le(&self, value: &Value) -> Result<Value, Error>;
+    fn and(&self, value: &Value) -> Result<Value, Error>;
+    fn or(&self, value: &Value) -> Result<Value, Error>;
 }
 
 impl Math for Value {

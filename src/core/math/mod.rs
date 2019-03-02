@@ -1,3 +1,3 @@
 pub mod math;
 
-pub use self::math::Math::*;
+pub use self::math::*;

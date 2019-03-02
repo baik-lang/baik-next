@@ -9,7 +9,12 @@ pest = "2.1.0"
 pest_derive = "2.1.0"
 serde_json = "1.0.39"
 serde = "1.0.89"
+quick-error = "1.2.2"
 
 [[bin]]
 name = "baik"
 doc = false
+
+[lib]
+name = "baik"
+path = "src/lib.rs"

@@ -1,6 +1,7 @@
-//use {Function, Functions, Context, Contexts, Compiled, Value};
+use crate::*;
+use {Function, Functions, Context, Contexts, Compiled, Value};
 use tree::Tree;
-use error::Error;
+use Error;
 use serde::Serialize;
 use to_value;
 use std::fmt;

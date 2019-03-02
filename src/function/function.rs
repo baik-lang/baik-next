@@ -1,6 +1,7 @@
+use crate::*;
 use std::fmt;
 use serde_json::Value;
-use error::Error;
+use Error;
 
 pub struct Function {
     pub max_args: Option<usize>,

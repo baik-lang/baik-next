@@ -1,3 +1,3 @@
-pub mod function.rs;
+pub mod function;
 
 pub use self::function::*;
