@@ -1,3 +1,5 @@
-fungsi test(a,b) {
-    tulis "abc"
+fungsi test(a,b)
+{
+d = a + b
+c = "tes"
 }

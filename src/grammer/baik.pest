@@ -1,69 +1,170 @@
-whitespace = _{ (" " | "\t" | "\r" | "\n") + }
+input                       = _{ SOI ~ expression+ ~ EOI }
+file                        = _{ SOI ~ definition* ~ EOI }
 
-comment = _{ "#" ~ (!("\n") ~ ANY)* ~ "\n" }
-letters = _{ 'A'..'Z' | 'a'..'z' }
-exp     = _{ ("e" | "E") ~ ("+" | "-")? ~ '1'..'9'+ }
-hex     = _{ '0'..'9' | 'a'..'f' | 'A'..'F' }
-unicode = _{ "u" ~ hex ~ hex ~ hex ~ hex }
-escape  = _{ "\\" ~ ("\"" | "\\" | "/" | "b" | "f" | "n" | "r" | "t" | unicode) }
+WHITESPACE                  = _{ (" " | "\t" | "\r" | "\n")+ }
+COMMENT                     = _{ comment_block | comment_line }
+comment_block               = @{ "###" ~ (!"###" ~ ANY)* ~ "###" }
+comment_line                = @{ "#" ~ (!("\r" | "\n") ~ ANY)* }
+newline                     = _{ (" " | "\t")* ~ ("\n" | "\r")+ ~ (" " | "\t")* }
+reserved                    =  { "let" | "benar" | "salah" | "def" | "defp" | "defs" | "type" | "trait" | "tulis" | "fungsi" | "jika" | "kalau" }
 
-op_true  = { "benar" }
-op_false = { "salah" }
-boolean  = _{ op_true | op_false }
-null     = { "null" }
-enum_val = @{ !(boolean | null) ~ name }
-list     = @{ ( list_str | "[" ) ~ (value ~ ("," ~ value)*?)? ~ ( "]" | ")") }
-list_str = {"untaian" ~ (" " | "(")*}
-object   = { "{" ~ (arg ~ ("," ~ arg)*)? ~ "}" }
-arg      = { name ~ ":" ~ value }
+expression                  = _{ infix | expression_inner }
+infix                       =  { expression_inner ~ (binary_operator ~ expression_inner)+ }
+instance_infix              =  { expression_instance_inner ~ (binary_operator ~ expression_instance_inner)+ }
+expression_inner            = _{ if_expression | function | call | declaration | unary | literal | local | braced_expression | tulis }
+braced_expression           = _{ "(" ~ expression ~ ")" }
+expression_instance_inner   = _{ property_get | property_set | expression_inner }
+instance_espression         = _{ instance_infix | expression_instance_inner }
 
-int      = @{ "-"? ~ ("0" | '1'..'9' ~ '0'..'9'*) }
-float    = @{
-    "-"? ~
-        (
-            '1'..'9'+ ~ exp |
-            "0" ~ "." ~ '0'..'9'+ ~ exp? |
-            '1'..'9' ~ '0'..'9'* ~ "." ~ '0'..'9'+ ~ exp?
-        )
-}
-string   = @{ PUSH("\"" | "'") ~ 
-            (escape 
-            | whitespace 
-            | letters 
-            | float 
-            | int 
-            | "!" | "@" | "#" | "$" | "%" | "^" | "&" | "(" | ")"
-            | "-" | "_" | "=" | "{" | "}" | "[" | "]" | ":" | ";"
-            | "<" | ">" | "." | "," | "/" | "?"
-            | add | subtract | multiply | divide | power
-            )* 
-            ~ POP  }
+declaration                 =  { ident ~ assign ~ instance_espression }
 
-variable = @{ name ~ (" " | "=")* ~ value }
-name  = { ("_" | letters | '0'..'9')* }
-value = { var_call | float | int | string | boolean | null | enum_val | list | object }
-var_call = { "&" ~ name }
+unary                       =  { unary_operator ~ (literal | local | braced_expression) }
 
-// arithmetic
-operation = _{ add | subtract | multiply | divide | power }
-    add      = { "+" }
-    subtract = { "-" }
-    multiply = { "*" }
-    divide   = { "/" }
-    power    = { "^" }
+call                        = _{ call_method | call_local }
+callable                    = _{ braced_expression | local | property_get | call_local | typename }
+call_local                  =  { (local | property_get) ~ call_arguments }
+call_method                 =  { callable ~ ("." ~ ident ~ call_arguments)+ }
 
-hitung = { term ~ (operation ~ term)* }
-term = _{ float | int | "(" ~ (hitung) ~ ")" }
+call_arguments              = _{ "(" ~ (call_argument ~ ("," ~ call_argument)* )? ~ ")" }
+call_argument               =  { expression }
 
-// Funcion
-func = @{ func_start ~ /*func_name ~ */func_input ~ (func_begin ~ func_body ~ func_end) }
-func_start = _{ "fungsi"}
-//func_name = _{name}
-func_input = _{name ~ PUSH("(")  ~ (name ~ ("," ~ name)*?)? ~ POP }
-func_begin = _{whitespace*? ~ "{" ~ whitespace*?}
-func_body = _{whitespace*? ~ (tulis | hitung | variable) ~ whitespace*? }
-func_end = _{ whitespace*? ~ "}"}
+defargs                     = _{ "(" ~ (defarg ~ ("," ~ defarg)*)? ~ ")" }
+defarg                      =  { ident }
 
-tulis = { "tulis" ~ (whitespace | int | string | hitung | ",")*}
+definition                  = _{ typedef | traitdef }
 
-document = _{ SOI ~ (tulis | hitung | func | variable) ~ EOI}
+typedef                     =  { "type" ~ typename ~ typeprops ~ typedefblock }
+typeprops                   =  { defargs? }
+typedefblock                =  { ("maka" ~ (methoddef | impldef)* ~ "selesai")? }
+
+traitdef                    =  { "trait" ~ typename ~ traitdefreqs ~ traitdefblock  }
+traitdefreqs                =  { (":" ~ typespec)? }
+traitdefblock               =  { ("maka" ~ (methoddef | methodspec)* ~ "selesai")? }
+
+impldef                     =  { "impl" ~ typename ~ impldefblock }
+impldefblock                =  { ("maka" ~ methoddef* ~ "selesai")? }
+
+methoddef                   = _{ defpublicmethod | defprivatemethod | defstaticmethod }
+methodspec                  = _{ defpublicspec | defstaticspec }
+methodargs                  =  { defargs? }
+methodnamewithpredicate     = @{ ident ~ "?" }
+methodname                  = @{ ident }
+methodblockstatic           =  { "maka" ~ expression* ~ "selesai" }
+methodblockinstance         =  { "maka" ~ instance_espression* ~ "selesai" }
+methodrval                  =  { ":" ~ typespec }
+
+defpublicmethod             =  { "def" ~ (methodnamewithpredicate | methodname) ~ methodargs ~ methodblockinstance }
+defprivatemethod            =  { "defp" ~ (methodnamewithpredicate | methodname) ~ methodargs ~ methodblockinstance }
+defstaticmethod             =  { "defs" ~ (methodnamewithpredicate | methodname) ~ methodargs ~ methodblockstatic }
+
+defpublicspec               =  { "def" ~ ((methodnamewithpredicate ~ methodargs) | (methodname ~ methodargs ~ methodrval)) }
+defstaticspec               =  { "defs" ~ ((methodnamewithpredicate ~ methodargs) | (methodname ~ methodargs ~ methodrval)) }
+
+typespec                    =  { typename ~ ("+" ~ typename)* }
+
+literal                     = _{ constructor | map | array | typename | string | atom | float | integer | boolean }
+
+ident                       = @{ !reserved ~ LOWERCASE_LETTER ~ (LETTER | "_")* }
+keyword                     = @{ ident ~ ":" }
+
+if_expression               =  { ("jika" | "kalau") ~ instance_espression ~ if_positive ~ if_else? ~ if_negative?}
+if_positive                 =  { "{" ~ instance_espression* ~ "}"}
+if_else                      =  { (("jika" ~ "tidak") | "jikatidak") ~ instance_espression* ~ "{" ~ instance_espression* ~ "}" }
+if_negative                 =  { "lainnya" ~ "{" ~ instance_espression* ~ "}" }
+
+property_get                = @{ "@" ~ ident }
+property_set                =  { "@{" ~ (property_set_pair ~ ("," ~ property_set_pair)*) ~ "}" }
+property_set_pair           =  { keyword ~ instance_espression }
+
+constructor                 =  { typename ~ "{" ~ (constructor_property ~ ("," ~ constructor_property)*)? ~ "}" }
+constructor_property        =  { keyword ~ expression }
+
+map                         =  { "{" ~ (map_pair ~ ("," ~ map_pair)*)? ~ "}" }
+map_pair                    =  { (keyword | (expression ~ "=>")) ~ expression }
+
+array                       =  { "[" ~ (expression ~ ("," ~ expression)*)? ~ "]" }
+
+atom                        = @{ ":" ~ ident }
+
+typename                    = @{ typename_name ~ ("." ~ typename_name)* }
+typename_name               = @{ UPPERCASE_LETTER ~ (LETTER | "_")* }
+
+function                    =  { "fungsi" ~ ident ~ function_clause ~ ("," ~ function_clause)*}
+function_args               =  { defargs }
+function_clause             =  { function_args ~ function_block }
+function_block              =  { "{" ~ expression* ~ "}" }
+
+float                       = ${ float_characteristic ~ "." ~ float_mantissa }
+float_characteristic        =  { "0" | (('1'..'9') ~ ('0'..'9' | "_")*) }
+float_mantissa              =  { ('0'..'9')+ }
+
+integer                     = ${ integer_hexadecimal_sigil | integer_octal_sigil | integer_binary_sigil | integer_decimal | integer_zero }
+integer_decimal             =  { '1'..'9' ~ ('0'..'9' | "_")* }
+integer_hexadecimal         =  { ('0'..'9' | 'a'..'f' | 'A'..'F') ~ ('0'..'9' | 'a'..'f' | 'A'..'F' | "_")* }
+integer_hexadecimal_sigil   = _{ "0x" ~ integer_hexadecimal }
+integer_octal               =  { ('0'..'7') ~ ('0'..'7' | "_" )* }
+integer_octal_sigil         = _{ "0o" ~ integer_octal }
+integer_binary              =  { ('0'..'1') ~ ('0'..'1' | "_")* }
+integer_binary_sigil        = _{ "0b" ~ integer_binary }
+integer_zero                =  { "0" }
+
+string                      = ${ string_single_line }
+string_single_line          = _{ string_delimiter ~ string_content ~ string_delimiter }
+string_content              = ${ (string_escape | !(string_delimiter | "\\") ~ ANY)* }
+string_delimiter            = _{ "\"" }
+string_unicode              = _{ "u" ~ ('0'..'9' | 'a'..'f' | 'A'..'F'){4} }
+string_escape               = _{ "\\" ~ ("\"" | "\\" | "a" | "b" | "f" | "n" | "r" | "t" | "v" | string_unicode) }
+
+tulis = { "tulis" ~ (instance_espression ~ ("," ~ instance_espression)* )}
+
+local =  { ident }
+
+exponent                    =  { "**" }
+multiply                    =  { "*" }
+divide                      =  { "/" }
+modulus                     =  { "%" }
+plus                        =  { "+" }
+minus                       =  { "-" }
+shift_left                  =  { "<<" }
+shift_right                 =  { ">>" }
+less_than                   =  { "<" }
+less_than_or_equal          =  { "<=" }
+greater_than                =  { ">" }
+greater_than_or_equal       =  { ">=" }
+not_equal                   =  { "!=" }
+equal                       =  { "==" }
+logical_and                 =  { "&&" }
+logical_or                  =  { "||" }
+logical_not                 =  { "!" }
+bitwise_and                 =  { "&" }
+bitwise_or                  =  { "|" }
+bitwise_xor                 =  { "^" }
+assign                      =  { "=" }
+all_operators               = _{
+                                 exponent |
+                                 multiply | divide | modulus |
+                                 plus | minus |
+                                 shift_left | shift_right |
+                                 less_than_or_equal | less_than |
+                                 greater_than_or_equal | greater_than |
+                                 not_equal | equal |
+                                 logical_and | logical_or | logical_not |
+                                 bitwise_and | bitwise_or | bitwise_xor |
+                                 assign
+                                }
+binary_operator             = _{
+                                 exponent |
+                                 multiply | divide | modulus |
+                                 plus | minus |
+                                 shift_left | shift_right |
+                                 less_than_or_equal | less_than |
+                                 greater_than_or_equal | greater_than |
+                                 not_equal | equal |
+                                 logical_and | logical_or |
+                                 bitwise_and | bitwise_or | bitwise_xor
+                               }
+unary_operator              = _{ plus | minus | logical_not }
+
+boolean                     =  { boolean_true | boolean_false }
+boolean_true                =  { "benar" }
+boolean_false               =  { "salah" }

@@ -1,0 +1,67 @@
+whitespace = _{ (" " | "\t" | "\r" | "\n") + }
+
+comment = _{ "#" ~ (!("\n") ~ ANY)* ~ "\n" }
+letters = _{ 'A'..'Z' | 'a'..'z' }
+exp     = _{ ("e" | "E") ~ ("+" | "-")? ~ '1'..'9'+ }
+hex     = _{ '0'..'9' | 'a'..'f' | 'A'..'F' }
+unicode = _{ "u" ~ hex ~ hex ~ hex ~ hex }
+escape  = _{ "\\" ~ ("\"" | "\\" | "/" | "b" | "f" | "n" | "r" | "t" | unicode) }
+
+op_true  = { "benar" }
+op_false = { "salah" }
+boolean  = _{ op_true | op_false }
+null     = { "null" }
+enum_val = @{ !(boolean | null) ~ name }
+list     = @{ ( list_str | "[" ) ~ (value ~ ("," ~ value)*?)? ~ ( "]" | ")") }
+list_str = {"untaian" ~ (" " | "(")*}
+object   = { "{" ~ (arg ~ ("," ~ arg)*)? ~ "}" }
+arg      = { name ~ ":" ~ value }
+
+int      = _{ "-"? ~ ("0" | '1'..'9' ~ '0'..'9'*) }
+float    = _{
+    "-"? ~
+        (
+            '1'..'9'+ ~ exp |
+            "0" ~ "." ~ '0'..'9'+ ~ exp? |
+            '1'..'9' ~ '0'..'9'* ~ "." ~ '0'..'9'+ ~ exp?
+        )
+}
+string   = @{ PUSH("\"" | "'") ~ 
+            (escape 
+            | whitespace 
+            | letters 
+            | float 
+            | int 
+            | "!" | "@" | "#" | "$" | "%" | "^" | "&" | "(" | ")"
+            | "-" | "_" | "=" | "{" | "}" | "[" | "]" | ":" | ";"
+            | "<" | ">" | "." | "," | "/" | "?"
+            | add | subtract | multiply | divide | power
+            )* 
+            ~ POP  }
+
+variable = @{ name ~ (" " | "=")* ~ value }
+name  = { ("_" | letters | '0'..'9' | whitespace)* }
+value = { var_call | float | int | string | boolean | null | enum_val | list | object }
+var_call = { "&" ~ name }
+
+// arithmetic
+operation = _{ add | subtract | multiply | divide | power }
+    add      = { "+" }
+    subtract = { "-" }
+    multiply = { "*" }
+    divide   = { "/" }
+    power    = { "^" }
+
+hitung = _{ term ~ (operation ~ term)* }
+term = _{ float | int | "(" ~ (hitung) ~ ")" }
+tulis = _{ "tulis" ~ (whitespace | int | string | hitung | ",")*}
+// Function
+func = _{ func_start ~ func_name ~ func_input  ~ func_begin ~ func_body ~ func_end }
+func_start = { "fungsi" }
+func_name = { name }
+func_input = { "("  ~ name ~ ("," ~ name)* ~ ")" }
+func_begin = {("{" | whitespace)*}
+func_body = {(tulis | hitung | variable | whitespace)}
+func_end = {("}" | whitespace)*}
+
+document = _{ SOI ~ (tulis | hitung | func | variable) ~ EOI}

@@ -7,8 +7,9 @@ use baik::core::interpreter;
 use clap::{Arg, App};
 use std::fs::File;
 use std::io::{BufRead, BufReader};
+use std::io::prelude::*;
 
-fn main() {
+fn main() -> std::io::Result<()>{
 
     let matches = App::new("Bahasa Perograman BAIK")
                     .version("v10.0")
@@ -21,10 +22,13 @@ fn main() {
                     .get_matches();
 
     let filename = matches.value_of("INPUT").unwrap();
-    let f = File::open(filename).expect("Berkas tidak ditemukan!");
-    for line in BufReader::new(f).lines() {
-        interpreter(line.unwrap());
-    }
+    let mut f = File::open(filename).expect("Berkas tidak ditemukan!");
+    let mut contents = String::new();
+    f.read_to_string(&mut contents)?;
+    interpreter(contents);
+    // for line in BufReader::new(f).lines() {
+    //     interpreter(line.unwrap());
+    // }
 
     match matches.occurrences_of("v") {
         0 => println!("exit"),
@@ -32,4 +36,5 @@ fn main() {
         2 => println!("Tons of verbose info"),
         3 | _ => println!("Don't be crazy"),
     }
+    Ok(())
 }

@@ -1,0 +1,24 @@
+# tes komentar
+
+###
+tes blok komentar
+###
+
+tes = benar
+
+fungsi test(a,b)
+{
+d = a + b
+c = "tes"
+}
+
+tulis "a",1+2,"\n"
+
+jika (a>1) {
+  a = "1"
+  tulis a
+} jikatidak(a > 2){
+  tulis a
+} lainnya {
+  tulis "berhenti"
+}
