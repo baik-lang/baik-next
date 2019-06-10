@@ -2,11 +2,15 @@
 extern crate pest;
 
 #[macro_use]
+extern crate lazy_static;
+
+#[macro_use]
 extern crate pest_derive;
 extern crate serde;
 extern crate serde_json;
 #[macro_use(quick_error)] extern crate quick_error;
 
+pub mod parser;
 pub mod core;
 pub mod function;
 pub mod tree;

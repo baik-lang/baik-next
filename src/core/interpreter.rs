@@ -1,31 +1,23 @@
-use pest::Parser;
-use pest::iterators::{Pairs};
 use crate::{eval};
+use crate::parser::ast::{Term, NodeType, Value};
 
-#[derive(Parser)]
-#[grammar = "grammer/baik.pest"]
-struct BaikLexer;
-//use Rule::*;
-
-fn pair(expr : Pairs<Rule>){
-    for inner_pair in expr {
-        match inner_pair.as_rule() {
-            function => {
-                println!("Digit:   {}", inner_pair.as_str());
-                pair(inner_pair.into_inner());
+pub fn interpreter(baik_script: &str) {
+    let baiks = Term::input(baik_script).unwrap();
+    for baik in baiks {
+        match baik.node_type() {
+            NodeType::Boolean => {
+                baik.boolean().unwrap().clone().value();
             },
-            EOI => {
-                println!("EOI:   {}", inner_pair.as_str());
-                pair(inner_pair.into_inner());
-            },
+            // NodeType::Declaration => {
+            //     let (ident, value) = baik.declaration().unwrap();
+            //     let value = match value.clone() {
+            //         NodeType::Integer => value.integer().unwrap()
+            //     };
+            //     println!("Declaration:  {} => {}", ident.value_ref(), value.value_ref());
+            // },
             _ => {
-                println!("----");
+                    println!("----");
             }
-        };
+        }
     }
-}
-
-pub fn interpreter(baik_script: String) {
-    let pairs = BaikLexer::parse(Rule::input, &baik_script).unwrap_or_else(|e| panic!("{}", e));
-    pair(pairs);
 }

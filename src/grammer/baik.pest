@@ -69,7 +69,7 @@ keyword                     = @{ ident ~ ":" }
 
 if_expression               =  { ("jika" | "kalau") ~ instance_espression ~ if_positive ~ if_else? ~ if_negative?}
 if_positive                 =  { "{" ~ instance_espression* ~ "}"}
-if_else                      =  { (("jika" ~ "tidak") | "jikatidak") ~ instance_espression* ~ "{" ~ instance_espression* ~ "}" }
+if_else                      =  { (("jika" ~ "tidak") | "jikatidak" | "atau") ~ instance_espression* ~ "{" ~ instance_espression* ~ "}" }
 if_negative                 =  { "lainnya" ~ "{" ~ instance_espression* ~ "}" }
 
 property_get                = @{ "@" ~ ident }

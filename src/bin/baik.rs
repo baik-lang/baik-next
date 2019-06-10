@@ -5,9 +5,7 @@ extern crate clap;
 
 use baik::core::interpreter;
 use clap::{Arg, App};
-use std::fs::File;
-use std::io::{BufRead, BufReader};
-use std::io::prelude::*;
+use std::fs;
 
 fn main() -> std::io::Result<()>{
 
@@ -21,20 +19,17 @@ fn main() -> std::io::Result<()>{
                         .index(1))
                     .get_matches();
 
-    let filename = matches.value_of("INPUT").unwrap();
-    let mut f = File::open(filename).expect("Berkas tidak ditemukan!");
-    let mut contents = String::new();
-    f.read_to_string(&mut contents)?;
-    interpreter(contents);
-    // for line in BufReader::new(f).lines() {
-    //     interpreter(line.unwrap());
-    // }
+    let path = matches.value_of("INPUT").unwrap();
+    let f = fs::read_to_string(path)
+        .unwrap_or_else(|e| panic!("Unable to open file '{}': {}", path, e));
+    interpreter(&f);
+    
 
-    match matches.occurrences_of("v") {
-        0 => println!("exit"),
-        1 => println!("Some verbose info"),
-        2 => println!("Tons of verbose info"),
-        3 | _ => println!("Don't be crazy"),
-    }
+    // match matches.occurrences_of("v") {
+    //     0 => println!("exit"),
+    //     1 => println!("Some verbose info"),
+    //     2 => println!("Tons of verbose info"),
+    //     3 | _ => println!("Don't be crazy"),
+    // }
     Ok(())
 }
