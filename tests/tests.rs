@@ -289,16 +289,16 @@ mod tests {
 
     #[test]
     fn test_not() {
-        assert_eq!(eval("!false"), Ok(to_value(true)));
-        assert_eq!(eval("!true"), Ok(to_value(false)));
+        assert_eq!(eval("!salah"), Ok(to_value(true)));
+        assert_eq!(eval("!benar"), Ok(to_value(false)));
         assert_eq!(eval("!(1 != 2)"), Ok(to_value(false)));
         assert_eq!(eval("!(1 == 2)"), Ok(to_value(true)));
-        assert_eq!(eval("!(1 == 2) == true"), Ok(to_value(true)));
+        assert_eq!(eval("!(1 == 2) == benar"), Ok(to_value(true)));
     }
 
     #[test]
     fn test_not_and_brackets() {
-        assert_eq!(eval("(!(1 == 2)) == true"), Ok(to_value(true)));
+        assert_eq!(eval("(!(1 == 2)) == benar"), Ok(to_value(true)));
     }
 
     #[test]
@@ -382,6 +382,19 @@ mod tests {
     fn test_custom_function() {
         assert_eq!(
             Expr::new("output()")
+                .function(
+                    "output",
+                    |_| Ok(to_value("This is custom function's output")),
+                )
+                .exec(),
+            Ok(to_value("This is custom function's output"))
+        );
+    }
+
+    #[test]
+    fn test_custom_function_with_input() {
+        assert_eq!(
+            Expr::new("output(a)")
                 .function(
                     "output",
                     |_| Ok(to_value("This is custom function's output")),
