@@ -5,7 +5,7 @@
     - [x] Tokenize
     - [x] Function
     - [x] Expr
-    - [x] Grammer
+    - [x] Grammar
     - [x] Operator
     - [x] Node
     - [x] Execution Tree

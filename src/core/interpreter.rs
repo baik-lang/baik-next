@@ -3,7 +3,7 @@ use pest::iterators::{Pairs};
 use crate::{eval};
 
 #[derive(Parser)]
-#[grammar = "grammer/baik.pest"]
+#[grammar = "grammar/baik.pest"]
 struct BaikLexer;
 //use Rule::*;
 
